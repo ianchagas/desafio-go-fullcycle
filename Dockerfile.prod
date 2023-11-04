@@ -1,0 +1,20 @@
+FROM golang:alpine AS builder
+
+WORKDIR /go/src/app
+COPY . .
+
+# inicia o modulo go
+RUN go mod init
+# baixar todas as dependencias
+RUN go get -d -v
+# gera executável
+RUN go build -o /go/bin/desafio-go
+
+# imagem base vazia (minimalist) para conter apenas o binário
+FROM scratch
+
+# copia o binário usando multistage
+COPY --from=builder /go/bin/desafio-go /go/bin/desafio-go
+
+# executa a nossa mensagem
+CMD ["/go/bin/desafio-go"]
